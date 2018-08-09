@@ -1,0 +1,211 @@
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Text;
+
+namespace HandEvaluator.Tests
+{
+    [TestClass]
+    public class HandEvaluatorTests
+    {
+        private HandEvaluator _handEvaluator;
+
+        [TestInitialize]
+        public void Setup()
+        {
+            _handEvaluator = new HandEvaluator();
+        }
+
+        [TestMethod]
+        [DataRow("AS TS 7H 3H 2D", "10 1 5 8 12 13")]
+        [DataRow("KS TS 7H 3H 2D", "10 2 5 8 12 13")]
+        [DataRow("4S TS 7H 3H 2D", "10 5 8 11 12 13")]
+        [DataRow("2S", "10 13")]
+        public void HandEvaluator_HighCard(string hand, string expected)
+        {
+            var actual = _handEvaluator.Evaluate(hand);
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        [DataRow("2X")]
+        [DataRow("AQ")]
+        public void HandEvaluator_InvalidSuit_ThrowsInvalidSuitException(string hand)
+        {
+            Assert.ThrowsException<InvalidSuitException>(() =>
+            {
+                _handEvaluator.Evaluate(hand);
+            });
+        }
+
+        [TestMethod]
+        [DataRow("US")]
+        public void HandEvaluator_InvalidRank_ThrowsInvalidRankException(string hand)
+        {
+            Assert.ThrowsException<InvalidRankException>(() =>
+            {
+                _handEvaluator.Evaluate(hand);
+            });
+        }
+
+        [TestMethod]
+        [DataRow("2SS")]
+        [DataRow("2S 2CC")]
+        public void HandEvaluator_InvalidCard_ThrowsInvalidCardException(string hand)
+        {
+            Assert.ThrowsException<InvalidCardException>(() =>
+            {
+                _handEvaluator.Evaluate(hand);
+            });
+        }
+
+        [TestMethod]
+        [DataRow("2S 2S")]
+        public void HandEvaluator_InvalidHand_DuplicateCardException(string hand)
+        {
+            Assert.ThrowsException<DuplicateCardException>(() =>
+            {
+                _handEvaluator.Evaluate(hand);
+            });
+        }
+
+        [TestMethod]
+        [DataRow("AS AC 7H 3H 2D", "9 1 8 12 13")]
+        [DataRow("KS KC 7H 3H 2D", "9 2 8 12 13")]
+        [DataRow("4S TS 7H 3H 3D", "9 12 5 8 11")]
+        public void HandEvaluator_Pair(string hand, string expected)
+        {
+            var actual = _handEvaluator.Evaluate(hand);
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        [DataRow("AS AC 7H 7C 2D", "8 1 8 13")]
+        [DataRow("KS KC 7H 7C 2D", "8 2 8 13")]
+        [DataRow("4S 7S 7H 3H 3D", "8 8 12 11")]
+        public void HandEvaluator_TwoPair(string hand, string expected)
+        {
+            var actual = _handEvaluator.Evaluate(hand);
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        [DataRow("AS AC AH 7C 2D", "7 1 8 13")]
+        [DataRow("KS KC KH 7C 2D", "7 2 8 13")]
+        [DataRow("4S 7S 7H 3H 7D", "7 8 11 12")]
+        public void HandEvaluator_Set(string hand, string expected)
+        {
+            var actual = _handEvaluator.Evaluate(hand);
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        [DataRow("AS 2C 3H 4C 5D", "6 10")]
+        [DataRow("AS KC QH JC TD", "6 1")]
+        [DataRow("8S 5S 4H 6H 7D", "6 7")]
+        public void HandEvaluator_Straight(string hand, string expected)
+        {
+            var actual = _handEvaluator.Evaluate(hand);
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        [DataRow("AS TS 7S 3S 2S", "5 1 5 8 12 13")]
+        [DataRow("KS TS 7S 3S 2S", "5 2 5 8 12 13")]
+        [DataRow("4S TS 7S 3S 2S", "5 5 8 11 12 13")]
+        public void HandEvaluator_Flush(string hand, string expected)
+        {
+            var actual = _handEvaluator.Evaluate(hand);
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        [DataRow("AS AC AH 3S 3C", "4 1 12")]
+        [DataRow("KS KC KH 2S 2C", "4 2 13")]
+        [DataRow("4S 4C 4H 7S 7C", "4 11 8")]
+        public void HandEvaluator_FullHouse(string hand, string expected)
+        {
+            var actual = _handEvaluator.Evaluate(hand);
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        [DataRow("AS AC AD AH 2S", "3 1 13")]
+        [DataRow("KS KC KD KH 7S", "3 2 8")]
+        [DataRow("4S 4C 4D 3S 4H", "3 11 12")]
+        public void HandEvaluator_Quad(string hand, string expected)
+        {
+            var actual = _handEvaluator.Evaluate(hand);
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        [DataRow("AS 2S 3S 4S 5S", "2 10")]
+        [DataRow("KS QS JS TS 9S", "2 2")]
+        [DataRow("8S 5S 4S 6S 7S", "2 7")]
+        public void HandEvaluator_StraightFlush(string hand, string expected)
+        {
+            var actual = _handEvaluator.Evaluate(hand);
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        [DataRow("AS KS QS JS TS", "1 1")]
+        [DataRow("AC KC QC JC TC", "1 1")]
+        [DataRow("AD KD QD JD TD", "1 1")]
+        [DataRow("AH KH QH JH TH", "1 1")]
+        public void HandEvaluator_RoyalFlush(string hand, string expected)
+        {
+            var actual = _handEvaluator.Evaluate(hand);
+
+            Assert.AreEqual(expected, actual);
+        }
+    }
+
+    [TestClass]
+    public class DeckTests
+    {
+        [TestMethod]
+        public void PrintAllCards()
+        {
+            var deck = new Deck();
+
+            for (int i = 0; i < 52; i++)
+            {
+                Console.WriteLine(deck.DrawCard());
+            }
+        }
+
+        [TestMethod]
+        public void PrintFlopTurnRiver_100Times()
+        {
+            var output = new StringBuilder();
+            var deck = new Deck();
+            for (int i = 0; i < 100; i++)
+            {
+                deck.Shuffle();
+                deck.DrawCard();
+                output.Append($"[{deck.DrawCard()} ");
+                output.Append($"{deck.DrawCard()} ");
+                output.Append($"{deck.DrawCard()}]");
+
+                deck.DrawCard();
+                output.Append($"[{deck.DrawCard()}]");
+
+                deck.DrawCard();
+                output.Append($"[{deck.DrawCard()}]");
+
+                Console.WriteLine(output.ToString());
+                output.Clear();
+            }
+        }
+    }
+}
