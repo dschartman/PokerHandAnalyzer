@@ -16,8 +16,7 @@ class Test_HandAnalyzerTests(unittest.TestCase):
             ('5', 5),
             ('4', 4),
             ('3', 3),
-            ('2', 2),
-            ('a', 1))
+            ('2', 2))
 
         for card, expected in subtests:
             with self.subTest(card=card):
