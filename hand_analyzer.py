@@ -1,4 +1,4 @@
-rank_dictionary = {
+_rank_dictionary = {
     'A': 14,
     'K': 13,
     'Q': 12,
@@ -14,5 +14,8 @@ rank_dictionary = {
     '2': 2
 }
 
-def AnalyzeRank(card):
-    return rank_dictionary[card]
+def determine_rank(card):
+    return _rank_dictionary[card]
+
+def analyze_hand(hand):
+    return '1 14'
