@@ -12,4 +12,6 @@ def analyze_hand(hand):
 
     handRank = 1
 
-    return f'{handRank} 13'
+    output = ' '.join(str(card.rankValue) for card in cards)
+
+    return f'{handRank} {output}'

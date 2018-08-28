@@ -24,7 +24,6 @@ class Test_HandAnalyzerTests(unittest.TestCase):
                 
                 self.assertEqual(expected, actual)
 
-    # 1. high card
     def test_high_card(self):
         subtests = (
             ('AS', '1 14'),
@@ -50,6 +49,7 @@ class Test_HandAnalyzerTests(unittest.TestCase):
     def test_high_card_handles_order(self):
         subtests = (
             ('AS KS', '1 14 13'),
+            ('7S KS 9D', '1 13 9 7'),
             ('KS AS', '1 14 13'))
 
         for hand, expected in subtests:
