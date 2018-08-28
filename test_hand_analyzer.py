@@ -26,13 +26,39 @@ class Test_HandAnalyzerTests(unittest.TestCase):
 
     # 1. high card
     def test_high_card(self):
-        subtests = ('AS', '1 14')
+        subtests = (
+            ('AS', '1 14'),
+            ('KS', '1 13'),
+            ('QS', '1 12'),
+            ('JS', '1 11'),
+            ('TS', '1 10'),
+            ('9S', '1 9'),
+            ('8S', '1 8'),
+            ('7S', '1 7'),
+            ('6S', '1 6'),
+            ('5S', '1 5'),
+            ('4S', '1 4'),
+            ('3S', '1 3'),
+            ('2S', '1 2'))
 
         for hand, expected in subtests:
             with self.subTest(hand=hand):
                 actual = hand_analyzer.analyze_hand(hand)
                 
                 self.assertEqual(expected, actual)
+
+    def test_high_card_handles_order(self):
+        subtests = (
+            ('AS KS', '1 14 13'),
+            ('KS AS', '1 14 13'))
+
+        for hand, expected in subtests:
+            with self.subTest(hand=hand):
+                actual = hand_analyzer.analyze_hand(hand)
+                
+                self.assertEqual(expected, actual)
+
+
     # 2. pair
     # 3. two pair
     # 4. set

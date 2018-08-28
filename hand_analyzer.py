@@ -1,21 +1,15 @@
-_rank_dictionary = {
-    'A': 14,
-    'K': 13,
-    'Q': 12,
-    'J': 11,
-    'T': 10,
-    '9': 9,
-    '8': 8,
-    '7': 7,
-    '6': 6,
-    '5': 5,
-    '4': 4,
-    '3': 3,
-    '2': 2
-}
+from card import Card
 
 def determine_rank(card):
-    return _rank_dictionary[card]
+    return Card(card, 'S').rankValue
 
+#Example hand = AS AC JD 9H 2D
 def analyze_hand(hand):
-    return '1 14'
+    cards = sorted(
+        [Card(rank, suit) for rank, suit in hand.split()],
+        key = lambda card: card.rankValue,
+        reverse=True)
+
+    handRank = 1
+
+    return f'{handRank} 13'
