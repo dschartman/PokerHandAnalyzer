@@ -58,8 +58,21 @@ class Test_HandAnalyzerTests(unittest.TestCase):
                 
                 self.assertEqual(expected, actual)
 
-
     # 2. pair
+    def test_pair(self):
+        subtests = (
+            ('AS AD', '2 14'),
+            ('KS KD', '2 13'),
+            ('KS KD 9S', '2 13 9'),
+            ('9S KD KS', '2 13 9'))
+
+        for hand, expected in subtests:
+            with self.subTest(hand=hand):
+                actual = hand_analyzer.analyze_hand(hand)
+                
+                self.assertEqual(expected, actual)
+
+
     # 3. two pair
     # 4. set
     # 5. straight
@@ -68,6 +81,7 @@ class Test_HandAnalyzerTests(unittest.TestCase):
     # 8. quad
     # 9. straight flush
     # 10. royal flush
+    # duplicate cards
 
 
 if __name__ == '__main__':

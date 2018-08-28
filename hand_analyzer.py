@@ -1,9 +1,9 @@
 from card import Card
+from collections import Counter
 
 def determine_rank(card):
     return Card(card, 'S').rankValue
 
-#Example hand = AS AC JD 9H 2D
 def analyze_hand(hand):
     cards = sorted(
         [Card(rank, suit) for rank, suit in hand.split()],
