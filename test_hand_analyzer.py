@@ -61,10 +61,10 @@ class Test_HandAnalyzerTests(unittest.TestCase):
     # 2. pair
     def test_pair(self):
         subtests = (
-            ('AS AD', '2 14 14'),
-            ('KS KD', '2 13 13'),
-            ('KS KD 9S', '2 13 13 9'),
-            ('9S KD KS', '2 13 13 9'))
+            ('AS AD', '2 14'),
+            ('KS KD', '2 13'),
+            ('KS KD 9S', '2 13 9'),
+            ('9S KD KS', '2 13 9'))
 
         for hand, expected in subtests:
             with self.subTest(hand=hand):
@@ -75,10 +75,10 @@ class Test_HandAnalyzerTests(unittest.TestCase):
     # 3. two pair
     def test_two_pair(self):
         subtests = (
-            ('AS AD KS KD', '3 14 14 13 13'),
-            ('KS KD AS AD', '3 14 14 13 13'),
-            ('KS KD 9S 9D', '3 13 13 9 9'),
-            ('9S KD KS 8D 8C', '3 13 13 8 8 9'))
+            ('AS AD KS KD', '3 14 13'),
+            ('KS KD AS AD', '3 14 13'),
+            ('KS KD 9S 9D', '3 13 9'),
+            ('9S KD KS 8D 8C', '3 13 8 9'))
 
         for hand, expected in subtests:
             with self.subTest(hand=hand):
