@@ -24,6 +24,9 @@ def analyze_hand(hand):
 
         if groupLength == 3:
             setCount += 1
+        
+        if groupLength == 4:
+            handRank = 8
 
     sortedGroups.sort(key = itemgetter(1), reverse=True)
 
@@ -35,6 +38,9 @@ def analyze_hand(hand):
 
     if setCount == 1:
         handRank = 4
+
+    if setCount == 1 and pairCount == 1:
+        handRank = 7
 
     cardOutput = ' '.join(str(g[0]) for g in sortedGroups)
 

@@ -88,9 +88,28 @@ class Test_HandAnalyzerTests(unittest.TestCase):
         self.__run_subtests(subtests)
 
     # 5. straight
+    # 5. wheel straight
+
+
     # 6. flush
     # 7. full house
+    def test_full_house(self):
+        subtests = (
+            ('AS AD AC KS KD', '7 14 13'),
+            ('KS KD KC AS AD', '7 13 14'),
+            ('2S 2D 2C AS AD', '7 2 14'))
+
+        self.__run_subtests(subtests)
+
     # 8. quad
+    def test_quads(self):
+        subtests = (
+            ('AS AD AC AH KD', '8 14 13'),
+            ('KS KD KC KH AD', '8 13 14'),
+            ('2S 2D 2C 2H AD', '8 2 14'))
+
+        self.__run_subtests(subtests)
+
     # 9. straight flush
     # 10. royal flush
     # duplicate cards
