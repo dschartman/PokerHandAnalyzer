@@ -94,6 +94,8 @@ class Test_HandAnalyzerTests(unittest.TestCase):
     # 9. straight flush
     # 10. royal flush
     # duplicate cards
+    # invalid ranks
+    # invalid suits
 
 
 if __name__ == '__main__':
