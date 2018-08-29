@@ -1,10 +1,9 @@
-from card import Card
 from rank_dictionary import rank_dictionary
 from itertools import groupby
 from operator import itemgetter
 
 def determine_rank(card):
-    return Card(card, 'S').rankValue
+    return rank_dictionary[card]
 
 def analyze_hand(hand):
     cards =[(rank, rank_dictionary[rank], suit) for rank, suit in hand.split()]
