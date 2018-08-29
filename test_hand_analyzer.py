@@ -2,6 +2,14 @@ import unittest
 import hand_analyzer
 
 class Test_HandAnalyzerTests(unittest.TestCase):
+
+    def __run_subtests(self, subtests):
+            for hand, expected in subtests:
+                with self.subTest(hand=hand):
+                    actual = hand_analyzer.analyze_hand(hand)
+                    
+                    self.assertEqual(expected, actual)
+
     def test_rank_properly_detected(self):
         subtests = (
             ('A', 14),
@@ -40,11 +48,7 @@ class Test_HandAnalyzerTests(unittest.TestCase):
             ('3S', '1 3'),
             ('2S', '1 2'))
 
-        for hand, expected in subtests:
-            with self.subTest(hand=hand):
-                actual = hand_analyzer.analyze_hand(hand)
-                
-                self.assertEqual(expected, actual)
+        self.__run_subtests(subtests)
 
     def test_high_card_handles_order(self):
         subtests = (
@@ -52,11 +56,7 @@ class Test_HandAnalyzerTests(unittest.TestCase):
             ('7S KS 9D', '1 13 9 7'),
             ('KS AS', '1 14 13'))
 
-        for hand, expected in subtests:
-            with self.subTest(hand=hand):
-                actual = hand_analyzer.analyze_hand(hand)
-                
-                self.assertEqual(expected, actual)
+        self.__run_subtests(subtests)
 
     # 2. pair
     def test_pair(self):
@@ -66,11 +66,7 @@ class Test_HandAnalyzerTests(unittest.TestCase):
             ('KS KD 9S', '2 13 9'),
             ('9S KD KS', '2 13 9'))
 
-        for hand, expected in subtests:
-            with self.subTest(hand=hand):
-                actual = hand_analyzer.analyze_hand(hand)
-                
-                self.assertEqual(expected, actual)
+        self.__run_subtests(subtests)
 
     # 3. two pair
     def test_two_pair(self):
@@ -80,13 +76,17 @@ class Test_HandAnalyzerTests(unittest.TestCase):
             ('KS KD 9S 9D', '3 13 9'),
             ('9S KD KS 8D 8C', '3 13 8 9'))
 
-        for hand, expected in subtests:
-            with self.subTest(hand=hand):
-                actual = hand_analyzer.analyze_hand(hand)
-                
-                self.assertEqual(expected, actual)
+        self.__run_subtests(subtests)
 
     # 4. set
+    def test_set(self):
+        subtests = (
+            ('AS AD AC', '4 14'),
+            ('KS KD KC', '4 13'),
+            ('9S KS KD KC', '4 13 9'))
+
+        self.__run_subtests(subtests)
+
     # 5. straight
     # 6. flush
     # 7. full house
@@ -97,6 +97,7 @@ class Test_HandAnalyzerTests(unittest.TestCase):
     # invalid ranks
     # invalid suits
 
+    
 
 if __name__ == '__main__':
     unittest.main()

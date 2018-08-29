@@ -14,12 +14,16 @@ def analyze_hand(hand):
 
     sortedGroups = []
     pairCount = 0
+    setCount = 0
     
     for key, group in groupedCards:
         groupLength = len(list(group))
         sortedGroups.append((key, groupLength))
         if groupLength == 2:
             pairCount += 1
+
+        if groupLength == 3:
+            setCount += 1
 
     sortedGroups.sort(key = itemgetter(1), reverse=True)
 
@@ -28,6 +32,9 @@ def analyze_hand(hand):
     
     if pairCount == 2: 
         handRank = 3 
+
+    if setCount == 1:
+        handRank = 4
 
     cardOutput = ' '.join(str(g[0]) for g in sortedGroups)
 
