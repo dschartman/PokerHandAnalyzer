@@ -88,8 +88,17 @@ class Test_HandAnalyzerTests(unittest.TestCase):
         self.__run_subtests(subtests)
 
     # 5. straight
-    # 5. wheel straight
+    def test_straight(self):
+        subtests = (
+            ('2S 3S 4S 5C 6D', '5 6'),
+            ('2S 3S 4S 6C 5D', '5 6'),
+            ('KS QD JC TD 9C', '5 13'),
+            ('AS QD JC TD 9C 8D', '5 12'),
+            ('AS KC QC JD TC', '5 14'))
 
+        self.__run_subtests(subtests)
+
+    # 5. wheel straight
 
     # 6. flush
     # 7. full house
