@@ -9,28 +9,35 @@ def analyze_hand(hand: str):
     cards =[(rank, rank_dictionary[rank], suit) for rank, suit in hand.split()]
     cards.sort(key=itemgetter(1), reverse = True)
 
-    handRank = 1
-
-    pairGroups, pairCount, setCount, quadCount = __process_pairs(cards)
-    straightCounter, straightHigh = __process_straight(cards)
+    pairGroups, counts = __process_pairs(cards)
+    straightInfo = __process_straight(cards)
 
     cards.sort(key=itemgetter(2),reverse = True)
     flush = __process_flush(cards)
 
-    cardOutput = ' '.join(str(g[0]) for g in pairGroups)
+    handRank, cardOutput = __process_result(counts, straightInfo, flush, pairGroups)
 
+    return f'{handRank} {cardOutput}'
+
+def __process_result(counts, straightInfo, flush, pairGroups):
+    pairCount = counts[0]
+    setCount = counts[1]
+    quadCount = counts[2]
+    straight = straightInfo[0]
+    straightHigh = straightInfo[1]
+
+    handRank = 1
     if pairCount == 1:
         handRank = 2
-    
+
     if pairCount == 2: 
         handRank = 3 
 
     if setCount == 1:
         handRank = 4
 
-    if straightCounter == 5:
+    if straight:
         handRank = 5
-        cardOutput = straightHigh
 
     if flush:
         handRank = 6
@@ -41,7 +48,18 @@ def analyze_hand(hand: str):
     if quadCount == 1:
         handRank = 8
 
-    return f'{handRank} {cardOutput}'
+    if straight and flush:
+        handRank = 9
+
+    if straight and flush and straightHigh == 14:
+        handRank = 10
+
+    if straight:
+        cardOutput = straightHigh
+    else:
+        cardOutput = ' '.join(str(g[0]) for g in pairGroups)
+        
+    return handRank, cardOutput
 
 def __process_flush(cards):
     suitedGroups = [(key, len(list(suitGroup))) for key, suitGroup in groupby(cards, key=itemgetter(2))]
@@ -69,7 +87,7 @@ def __process_pairs(cards: list):
 
     sortedGroups.sort(key = itemgetter(1), reverse=True)
 
-    return sortedGroups, pairCount, setCount, quadCount
+    return sortedGroups, (pairCount, setCount, quadCount)
 
 def __process_straight(cards: list):
     expectedRankValue = cards[0][1]
@@ -96,5 +114,5 @@ def __process_straight(cards: list):
         if rankValue == 14:
             wheel = True
 
-    return straightCounter, straightHigh
+    return straightCounter == 5, straightHigh
 

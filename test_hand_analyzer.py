@@ -126,7 +126,24 @@ class Test_HandAnalyzerTests(unittest.TestCase):
         self.__run_subtests(subtests)
 
     # 9. straight flush
-    # 10. royal flush
+    def test_straight_flush(self):
+        subtests = (
+            ('2S 3S 4S 5S 6S', '9 6'),
+            ('2S 3S 4S 6S 5S', '9 6'),
+            ('KS QS JS TS 9S', '9 13'),
+            ('AC QS JS TS 9S 8S', '9 12'),
+            ('AS 2S 3S 4S 5S', '9 5'))
+
+        self.__run_subtests(subtests)
+
+    # 10. royal 
+    def test_royal_flush(self):
+        subtests = (
+            ('AS KS QS JS TS', '10 14'),
+            ('AC KC QC JC TC', '10 14'))
+
+        self.__run_subtests(subtests)
+
     # duplicate cards
     # invalid ranks
     # invalid suits
