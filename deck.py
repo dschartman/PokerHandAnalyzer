@@ -7,8 +7,11 @@ class Deck:
     def draw_card(self):
         return self.deck.pop(0)
 
-    def blane(self, target):
-        return self.deck.remove(target)
+    def remove_card(self, card):
+        return self.deck.remove(card)
+
+    def add_card(self, card):
+        self.deck.append(card)
 
     def shuffle(self):
         self.deck = self.__build_new_deck()

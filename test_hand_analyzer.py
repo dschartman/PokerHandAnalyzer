@@ -1,7 +1,7 @@
 import unittest
 import hand_analyzer
 
-class Test_HandAnalyzerTests(unittest.TestCase):
+class HandAnalyzerTests(unittest.TestCase):
 
     def __run_subtests(self, subtests):
             for hand, expected in subtests:
