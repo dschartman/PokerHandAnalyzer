@@ -15,12 +15,22 @@ def DetermineBestFiveCardHand(string_cards: list):
     cards.sort(key=lambda tup: tup[1], reverse = True)
 
     string_score = ""
+    card_count = 0
     for c in cards:
-        string_score += str(c.rank_value+__PLACE_MODIFIER) 
+        if card_count < 5:
+            string_score += str(c.rank_value+__PLACE_MODIFIER)
+            card_count += 1
 
     score = int(string_score)
 
-    return Result(high_card, score, [f'{c.rank}{c.suit}' for c in cards])
+    top_five_cards = []
+    card_count = 0
+    for c in cards:
+        if card_count < 5:
+            top_five_cards.append(f'{c.rank}{c.suit}')
+            card_count += 1
+
+    return Result(high_card, score, top_five_cards)
 
 def __GetRankValue(rank):
     if rank == 'T':
