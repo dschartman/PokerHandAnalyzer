@@ -59,7 +59,9 @@ def test_set(test_input, expected):
 
 @pytest.mark.parametrize("test_input,expected", [
     (['2S', '3H', '4C', '5S', '6H'], analyzer.Result(15163154141133124, ['6H', '5S', '4C', '3H', '2S'])),
+    (['2S', '3H', '4C', '5S', 'AH'], analyzer.Result(15163154141133124, ['5S', '4C', '3H', '2S', 'AH'])),
     (['2S', '3H', '4C', '5S', '6H', '7S'], analyzer.Result(15174163154141133, ['7S', '6H', '5S', '4C', '3H'])),
+    (['2S', '3H', '4C', '5S', '6H', 'AS'], analyzer.Result(15163154141133124, ['6H', '5S', '4C', '3H', '2S'])),
     (['9S', 'QH', 'KC', 'JS', 'TH'], analyzer.Result(15231223214203194, ['KC', 'QH', 'JS', 'TH', '9S'])),
 ])
 def test_straight(test_input, expected):
@@ -80,6 +82,14 @@ def test_flush(test_input, expected):
     (['2S', '2H', '2C', '3S', '3H', '3C'], analyzer.Result(17134133131124123, ['3S', '3H', '3C', '2S', '2H'])),
 ])
 def test_full_house(test_input, expected):
+    actual = analyzer.DetermineBestFiveCardHand(test_input)
+
+    assert actual == expected
+
+@pytest.mark.parametrize("test_input,expected", [
+    (['2H', '3H', '4H', '5H', '6H'], analyzer.Result(19163153143133123, ['6H', '5H', '4H', '3H', '2H'])),
+])
+def test_straight_flush(test_input, expected):
     actual = analyzer.DetermineBestFiveCardHand(test_input)
 
     assert actual == expected

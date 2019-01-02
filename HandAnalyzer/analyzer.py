@@ -12,6 +12,9 @@ __SET = "14"
 __STRAIGHT = "15"
 __FLUSH = "16"
 __FULL_HOUSE = "17"
+__QUADS = "18"
+__STRAIGHT_FLUSH = "19"
+__ROYAL_FLUSH = "20"
 
 def DetermineBestFiveCardHand(string_cards: list):
     cards = __to_cards(string_cards)
@@ -21,7 +24,21 @@ def DetermineBestFiveCardHand(string_cards: list):
     rank_value_groups.sort(key=lambda tup: tup[1], reverse = True)
     pair_count, set_count = __count_pairs(rank_value_groups)
 
-    straight_counter = __count_straight(cards)
+    straight_counter = 0
+    next_value = []
+    straight_cards = []
+    for c in cards:
+        if c.rank_value in next_value:
+            straight_counter += 1
+        else:
+            straight_counter = 1
+            straight_cards = []
+
+        straight_cards.append(c)
+        if c.rank_value == 14:
+            next_value = [13, 5]
+        else:
+            next_value = [c.rank_value - 1]
 
     suit_groups = __group_attribute(cards, 'suit')
     suit_groups.sort(key=lambda tup: tup[1], reverse = True)
@@ -49,19 +66,22 @@ def DetermineBestFiveCardHand(string_cards: list):
     if set_count > 1:
         string_score = __FULL_HOUSE
 
+    if straight_counter > 4 and flush_counter > 4:
+        string_score = __STRAIGHT_FLUSH
+
     card_count = 0
     top_five_cards = []
-    if string_score == __HIGH_CARD:
-        for c in cards:
-            if card_count < 5:
-                top_five_cards.append(c)
-                card_count += 1
-    elif string_score == __FLUSH:
+    if string_score == __FLUSH:
         for sp in suit_groups:
             for c in sp[2]:
                 if card_count < 5:
                     top_five_cards.append(c)
                     card_count += 1
+    elif string_score == __STRAIGHT:
+        for c in straight_cards:
+            if card_count < 5:
+                top_five_cards.append(c)
+                card_count += 1
     else:
         for sp in rank_value_groups:
             for c in sp[2]:
@@ -87,6 +107,7 @@ def __count_straight(cards):
             straight_counter = 1
 
         next_value = c.rank_value - 1
+
     return straight_counter
 
 def __count_pairs(grouped_cards):
