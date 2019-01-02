@@ -1,5 +1,5 @@
 import unittest
-from deck import Deck
+from HandAnalyzer.deck import Deck
 
 class DeckTests(unittest.TestCase):
     def test_no_duplicate_cards(self):

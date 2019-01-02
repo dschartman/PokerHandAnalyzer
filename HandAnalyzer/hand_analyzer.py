@@ -1,4 +1,4 @@
-from rank_dictionary import rank_dictionary
+from .rank_dictionary import rank_dictionary
 from itertools import groupby
 from operator import itemgetter
 

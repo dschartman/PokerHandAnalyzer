@@ -1,0 +1,6 @@
+python
+ipython
+pylint
+pytest
+pytest-watch
+rope

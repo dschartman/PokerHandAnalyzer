@@ -1,5 +1,5 @@
 import unittest
-import hand_analyzer
+from HandAnalyzer import hand_analyzer
 
 class HandAnalyzerTests(unittest.TestCase):
 
