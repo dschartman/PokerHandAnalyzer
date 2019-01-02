@@ -17,11 +17,15 @@ def DetermineBestFiveCardHand(string_cards: list):
     cards = __to_cards(string_cards)
     cards.sort(key=lambda tup: tup[1], reverse = True)
 
-    grouped_cards = __group_rank_values(cards)
-    grouped_cards.sort(key=lambda tup: tup[1], reverse = True)
+    rank_value_groups = __group_attribute(cards, 'rank_value')
+    rank_value_groups.sort(key=lambda tup: tup[1], reverse = True)
+    pair_count, set_count = __count_pairs(rank_value_groups)
 
-    pair_count, set_count = __count_pairs(grouped_cards)
     straight_counter = __count_straight(cards)
+
+    suit_groups = __group_attribute(cards, 'suit')
+    suit_groups.sort(key=lambda tup: tup[1], reverse = True)
+    flush_counter = suit_groups[0][1]
 
     string_score = __HIGH_CARD
     if pair_count == 1:
@@ -36,6 +40,9 @@ def DetermineBestFiveCardHand(string_cards: list):
     if straight_counter > 4:
         string_score = __STRAIGHT
 
+    if flush_counter > 4:
+        string_score = __FLUSH
+
     if pair_count == 1 and set_count == 1:
         string_score = __FULL_HOUSE
     
@@ -49,8 +56,14 @@ def DetermineBestFiveCardHand(string_cards: list):
             if card_count < 5:
                 top_five_cards.append(c)
                 card_count += 1
+    elif string_score == __FLUSH:
+        for sp in suit_groups:
+            for c in sp[2]:
+                if card_count < 5:
+                    top_five_cards.append(c)
+                    card_count += 1
     else:
-        for sp in grouped_cards:
+        for sp in rank_value_groups:
             for c in sp[2]:
                 if card_count < 5:
                     top_five_cards.append(c)
@@ -84,11 +97,12 @@ def __count_pairs(grouped_cards):
             pair_count += 1
         if g[1] == 3:
             set_count += 1
+
     return pair_count, set_count
 
-def __group_rank_values(cards):
+def __group_attribute(cards, attribute):
     grouped_cards = []
-    rank_value_groups = groupby(cards, key=attrgetter('rank_value'))
+    rank_value_groups = groupby(cards, key=attrgetter(attribute))
     for key, rank_value_group in rank_value_groups:
         group = list(rank_value_group)
         grouped_cards.append((key, len(group), group))
