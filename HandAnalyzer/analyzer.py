@@ -1,10 +1,11 @@
 from collections import namedtuple
 
-def DetermineBestFiveCardHand(string_cards: list):
-    result = []
-    high_card = 1
+Card = namedtuple('Card', ['rank', 'rank_value', 'suit'])
+Result = namedtuple('Result', ['hand_rank', 'hand_score', 'best_five'])
+__PLACE_MODIFIER = 10
 
-    Card = namedtuple('Card', ['rank', 'rank_value', 'suit'])
+def DetermineBestFiveCardHand(string_cards: list):
+    high_card = 1
 
     cards = []
     for sc in string_cards:
@@ -13,11 +14,13 @@ def DetermineBestFiveCardHand(string_cards: list):
 
     cards.sort(key=lambda tup: tup[1], reverse = True)
 
-    result.append(high_card)
+    string_score = ""
     for c in cards:
-        result.append(c.rank_value) 
+        string_score += str(c.rank_value+__PLACE_MODIFIER) 
 
-    return result
+    score = int(string_score)
+
+    return Result(high_card, score, [f'{c.rank}{c.suit}' for c in cards])
 
 def __GetRankValue(rank):
     if rank == 'T':
