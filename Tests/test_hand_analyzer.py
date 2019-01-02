@@ -148,12 +148,12 @@ class HandAnalyzerTests(unittest.TestCase):
     # invalid ranks
     # invalid suits
 
-    def test_only_best_five_are_returned(self):
-        subtests = (
-            ('KH 5H AH 6D TS 7H TH', '2 10 14 13 7 6'),
-            ('KH 2S AH 6D TS 7H TH', '2 10 14 13 7 6'))
+    # def test_only_best_five_are_returned(self):
+    #     subtests = (
+    #         ('KH 5H AH 6D TS 7H TH', '2 10 14 13 7 6'),
+    #         ('KH 2S AH 6D TS 7H TH', '2 10 14 13 7 6'))
 
-        self.__run_subtests(subtests)
+    #     self.__run_subtests(subtests)
     
 
 if __name__ == '__main__':
