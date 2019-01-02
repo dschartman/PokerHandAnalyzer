@@ -41,8 +41,45 @@ def test_pair(test_input, expected):
 
 @pytest.mark.parametrize("test_input,expected", [
     (['3C', '3H', '2S', '2H'], analyzer.Result(13131133124123, ['3C', '3H', '2S', '2H'])),
+    (['3C', '3H', 'AS', 'AH', '8C', '8H'], analyzer.Result(13244243181183131, ['AS', 'AH', '8C', '8H', '3C'])),
 ])
 def test_two_pair(test_input, expected):
+    actual = analyzer.DetermineBestFiveCardHand(test_input)
+
+    assert actual == expected
+
+@pytest.mark.parametrize("test_input,expected", [
+    (['2S', '2H', '2C'], analyzer.Result(14124123121, ['2S', '2H', '2C'])),
+    (['2S', '2H', '2C', '5D', '3C'], analyzer.Result(14124123121152131, ['2S', '2H', '2C', '5D', '3C'])),
+])
+def test_set(test_input, expected):
+    actual = analyzer.DetermineBestFiveCardHand(test_input)
+
+    assert actual == expected
+
+@pytest.mark.parametrize("test_input,expected", [
+    (['2S', '3H', '4C', '5S', '6H'], analyzer.Result(15163154141133124, ['6H', '5S', '4C', '3H', '2S'])),
+    (['2S', '3H', '4C', '5S', '6H', '7S'], analyzer.Result(15174163154141133, ['7S', '6H', '5S', '4C', '3H'])),
+    (['9S', 'QH', 'KC', 'JS', 'TH'], analyzer.Result(15231223214203194, ['KC', 'QH', 'JS', 'TH', '9S'])),
+])
+def test_straight(test_input, expected):
+    actual = analyzer.DetermineBestFiveCardHand(test_input)
+
+    assert actual == expected
+
+@pytest.mark.parametrize("test_input,expected", [
+    (['2S', '9S', '4S', '5S', '6S'], analyzer.Result(16194164154144124, ['9S', '6S', '5S', '4S', '2S'])),
+])
+def test_flush(test_input, expected):
+    actual = analyzer.DetermineBestFiveCardHand(test_input)
+
+    assert actual == expected
+
+@pytest.mark.parametrize("test_input,expected", [
+    (['2S', '2H', '2C', '3S', '3H'], analyzer.Result(17124123121134133, ['2S', '2H', '2C', '3S', '3H'])),
+    (['2S', '2H', '2C', '3S', '3H', '3C'], analyzer.Result(17134133131124123, ['3S', '3H', '3C', '2S', '2H'])),
+])
+def test_full_house(test_input, expected):
     actual = analyzer.DetermineBestFiveCardHand(test_input)
 
     assert actual == expected
