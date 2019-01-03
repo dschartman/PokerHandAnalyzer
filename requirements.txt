@@ -1,5 +1,5 @@
 python
-ipython
+jupyter
 pylint
 pytest
 pytest-watch
