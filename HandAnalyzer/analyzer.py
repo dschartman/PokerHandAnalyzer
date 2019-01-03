@@ -27,18 +27,27 @@ def DetermineBestFiveCardHand(string_cards: list):
     straight_counter = 0
     next_value = []
     straight_cards = []
+    wheel = False
     for c in cards:
         if c.rank_value in next_value:
             straight_counter += 1
+            if wheel and c.rank_value == 13:
+                wheel = False
+
         else:
             straight_counter = 1
             straight_cards = []
+            wheel = False
 
         straight_cards.append(c)
         if c.rank_value == 14:
+            wheel = True
             next_value = [13, 5]
         else:
             next_value = [c.rank_value - 1]
+
+    if wheel:
+       straight_cards.append(straight_cards.pop(0))
 
     suit_groups = __group_attribute(cards, 'suit')
     suit_groups.sort(key=lambda tup: tup[1], reverse = True)
@@ -67,7 +76,10 @@ def DetermineBestFiveCardHand(string_cards: list):
         string_score = __FULL_HOUSE
 
     if straight_counter > 4 and flush_counter > 4:
-        string_score = __STRAIGHT_FLUSH
+        if straight_cards[0].rank_value == 14:
+            string_score = __ROYAL_FLUSH
+        else:
+            string_score = __STRAIGHT_FLUSH
 
     card_count = 0
     top_five_cards = []

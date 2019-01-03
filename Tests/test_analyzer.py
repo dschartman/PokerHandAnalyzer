@@ -59,7 +59,7 @@ def test_set(test_input, expected):
 
 @pytest.mark.parametrize("test_input,expected", [
     (['2S', '3H', '4C', '5S', '6H'], analyzer.Result(15163154141133124, ['6H', '5S', '4C', '3H', '2S'])),
-    (['2S', '3H', '4C', '5S', 'AH'], analyzer.Result(15163154141133124, ['5S', '4C', '3H', '2S', 'AH'])),
+    (['2S', '3H', '4C', '5S', 'AH'], analyzer.Result(15154141133124243, ['5S', '4C', '3H', '2S', 'AH'])),
     (['2S', '3H', '4C', '5S', '6H', '7S'], analyzer.Result(15174163154141133, ['7S', '6H', '5S', '4C', '3H'])),
     (['2S', '3H', '4C', '5S', '6H', 'AS'], analyzer.Result(15163154141133124, ['6H', '5S', '4C', '3H', '2S'])),
     (['9S', 'QH', 'KC', 'JS', 'TH'], analyzer.Result(15231223214203194, ['KC', 'QH', 'JS', 'TH', '9S'])),
@@ -93,6 +93,15 @@ def test_straight_flush(test_input, expected):
     actual = analyzer.DetermineBestFiveCardHand(test_input)
 
     assert actual == expected
+
+@pytest.mark.parametrize("test_input,expected", [
+    (['TH', 'JH', 'QH', 'KH', 'AH'], analyzer.Result(20243233223213203, ['AH', 'KH', 'QH', 'JH', 'TH'])),
+])
+def test_royal_flush(test_input, expected):
+    actual = analyzer.DetermineBestFiveCardHand(test_input)
+
+    assert actual == expected
+
 
 # ___________Hand Ranks____________
 # HighCard       (1)
