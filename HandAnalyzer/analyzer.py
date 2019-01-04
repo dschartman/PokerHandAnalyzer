@@ -1,6 +1,7 @@
 from collections import namedtuple
 from itertools import groupby
 from operator import attrgetter
+from .exceptions import DuplicateCardException
 
 Card = namedtuple('Card', ['rank', 'rank_value', 'suit'])
 Result = namedtuple('Result', ['hand_score', 'best_five'])
@@ -16,19 +17,32 @@ __QUADS = "18"
 __STRAIGHT_FLUSH = "19"
 __ROYAL_FLUSH = "20"
 
-def DetermineBestFiveCardHand(string_cards: list):
+def score_best_hand(string_cards: list):
     cards = __to_cards(string_cards)
     cards.sort(key=lambda tup: tup[1], reverse = True)
 
+    seen = set()
+    uniq = []
+    for x in cards:
+        if x not in seen:
+            uniq.append(x)
+            seen.add(x)
+        else:
+            raise DuplicateCardException(f'You can\'t have more than one {x}!')
+
     rank_value_groups = __group_attribute(cards, 'rank_value')
     rank_value_groups.sort(key=lambda tup: tup[1], reverse = True)
-    pair_count, set_count = __count_pairs(rank_value_groups)
+    pair_count, set_count, quad_count = __count_pairs(rank_value_groups)
 
     straight_counter = 0
     next_value = []
+    previous_value = 0
     straight_cards = []
     wheel = False
     for c in cards:
+        if c.rank_value == previous_value:
+            continue
+
         if c.rank_value in next_value:
             straight_counter += 1
             if wheel and c.rank_value == 13:
@@ -39,6 +53,7 @@ def DetermineBestFiveCardHand(string_cards: list):
             straight_cards = []
             wheel = False
 
+        previous_value = c.rank_value
         straight_cards.append(c)
         if c.rank_value == 14:
             wheel = True
@@ -49,6 +64,7 @@ def DetermineBestFiveCardHand(string_cards: list):
     if wheel:
        straight_cards.append(straight_cards.pop(0))
 
+    cards.sort(key=lambda tup: tup[2], reverse = True)
     suit_groups = __group_attribute(cards, 'suit')
     suit_groups.sort(key=lambda tup: tup[1], reverse = True)
     flush_counter = suit_groups[0][1]
@@ -75,6 +91,9 @@ def DetermineBestFiveCardHand(string_cards: list):
     if set_count > 1:
         string_score = __FULL_HOUSE
 
+    if quad_count == 1:
+        string_score = __QUADS
+
     if straight_counter > 4 and flush_counter > 4:
         if straight_cards[0].rank_value == 14:
             string_score = __ROYAL_FLUSH
@@ -89,7 +108,7 @@ def DetermineBestFiveCardHand(string_cards: list):
                 if card_count < 5:
                     top_five_cards.append(c)
                     card_count += 1
-    elif string_score == __STRAIGHT:
+    elif string_score == __STRAIGHT or string_score == __ROYAL_FLUSH:
         for c in straight_cards:
             if card_count < 5:
                 top_five_cards.append(c)
@@ -125,13 +144,16 @@ def __count_straight(cards):
 def __count_pairs(grouped_cards):
     pair_count = 0
     set_count = 0
+    quad_count = 0
     for g in grouped_cards:
         if g[1] == 2:
             pair_count += 1
         if g[1] == 3:
             set_count += 1
+        if g[1] == 4:
+            quad_count += 1
 
-    return pair_count, set_count
+    return pair_count, set_count, quad_count
 
 def __group_attribute(cards, attribute):
     grouped_cards = []
