@@ -18,54 +18,19 @@ __STRAIGHT_FLUSH = "19"
 __ROYAL_FLUSH = "20"
 
 def score_best_hand(string_cards: list):
-    cards = __to_cards(string_cards)
+    cards = _to_cards(string_cards)
     cards.sort(key=lambda tup: tup[1], reverse = True)
 
-    seen = set()
-    uniq = []
-    for x in cards:
-        if x not in seen:
-            uniq.append(x)
-            seen.add(x)
-        else:
-            raise DuplicateCardException(f'You can\'t have more than one {x}!')
-
-    rank_value_groups = __group_attribute(cards, 'rank_value')
+    # need to move sort into my group by method.  Python needs to sort first
+    rank_value_groups = _group_cards_by_attribute(cards, 'rank_value')
     rank_value_groups.sort(key=lambda tup: tup[1], reverse = True)
     pair_count, set_count, quad_count = __count_pairs(rank_value_groups)
 
-    straight_counter = 0
-    next_value = []
-    previous_value = 0
-    straight_cards = []
-    wheel = False
-    for c in cards:
-        if c.rank_value == previous_value:
-            continue
-
-        if c.rank_value in next_value:
-            straight_counter += 1
-            if wheel and c.rank_value == 13:
-                wheel = False
-
-        else:
-            straight_counter = 1
-            straight_cards = []
-            wheel = False
-
-        previous_value = c.rank_value
-        straight_cards.append(c)
-        if c.rank_value == 14:
-            wheel = True
-            next_value = [13, 5]
-        else:
-            next_value = [c.rank_value - 1]
-
-    if wheel:
-       straight_cards.append(straight_cards.pop(0))
+    straight_cards = _find_straight(cards)
+    straight = True if len(straight_cards) > 4 else False
 
     cards.sort(key=lambda tup: tup[2], reverse = True)
-    suit_groups = __group_attribute(cards, 'suit')
+    suit_groups = _group_cards_by_attribute(cards, 'suit')
     suit_groups.sort(key=lambda tup: tup[1], reverse = True)
     flush_counter = suit_groups[0][1]
 
@@ -79,7 +44,7 @@ def score_best_hand(string_cards: list):
     if set_count == 1:
         string_score = __SET
 
-    if straight_counter > 4:
+    if straight:
         string_score = __STRAIGHT
 
     if flush_counter > 4:
@@ -94,7 +59,7 @@ def score_best_hand(string_cards: list):
     if quad_count == 1:
         string_score = __QUADS
 
-    if straight_counter > 4 and flush_counter > 4:
+    if straight and flush_counter > 4:
         if straight_cards[0].rank_value == 14:
             string_score = __ROYAL_FLUSH
         else:
@@ -128,6 +93,36 @@ def score_best_hand(string_cards: list):
 
     return Result(score, [f'{c.rank}{c.suit}' for c in top_five_cards])
 
+def _find_straight(cards):
+    next_values = []
+    previous_value = 0
+    straight = []
+    wheel = False
+    for c in cards:
+        if c.rank_value == previous_value:
+            continue
+
+        if c.rank_value in next_values:
+            if wheel and c.rank_value == 13:
+                wheel = False
+
+        else:
+            straight = []
+            wheel = False
+
+        previous_value = c.rank_value
+        straight.append(c)
+        if c.rank_value == 14:
+            wheel = True
+            next_values = [13, 5]
+        else:
+            next_values = [c.rank_value - 1]
+
+    if wheel:
+       straight.append(straight.pop(0))
+
+    return straight
+
 def __count_straight(cards):
     straight_counter = 0
     next_value = 0
@@ -155,7 +150,7 @@ def __count_pairs(grouped_cards):
 
     return pair_count, set_count, quad_count
 
-def __group_attribute(cards, attribute):
+def _group_cards_by_attribute(cards, attribute):
     grouped_cards = []
     rank_value_groups = groupby(cards, key=attrgetter(attribute))
     for key, rank_value_group in rank_value_groups:
@@ -164,11 +159,16 @@ def __group_attribute(cards, attribute):
 
     return grouped_cards
 
-def __to_cards(string_cards: list):
+def _to_cards(string_cards: list):
+    seen = set()
     cards = []
     for sc in string_cards:
-        break_out = list(sc)
-        cards.append(Card(break_out[0], __get_rank_value(break_out[0]), break_out[1]))
+        if sc not in seen:
+            seen.add(sc)
+            break_out = list(sc)
+            cards.append(Card(break_out[0], __get_rank_value(break_out[0]), break_out[1]))
+        else:
+            raise DuplicateCardException(f'You can\'t have more than one {sc}!')
 
     return cards
 
