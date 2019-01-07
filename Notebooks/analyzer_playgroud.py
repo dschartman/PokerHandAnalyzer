@@ -31,3 +31,10 @@ if type(1) is not int:
     print(True)
 else:
     print(False)
+
+
+#%%
+from HandAnalyzer.card import Card
+
+c = Card('A', 'S')
+c

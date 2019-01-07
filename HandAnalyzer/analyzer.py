@@ -3,10 +3,9 @@ from itertools import groupby
 from operator import attrgetter
 from .exceptions import DuplicateCardException
 from .exceptions import InvalidCardException
+from .card import Card
+from .score import score_top_five_cards
 
-Card = namedtuple('Card', ['rank', 'rank_value', 'suit'])
-Result = namedtuple('Result', ['hand_score', 'best_five'])
-__PLACE_MODIFIER = 10
 __HIGH_CARD = "11"
 __PAIR = "12"
 __TWO_PAIR = "13"
@@ -20,21 +19,48 @@ __ROYAL_FLUSH = "20"
 
 def score_best_hand(string_cards: list):
     cards = _to_cards(string_cards)
-    cards.sort(key=lambda tup: tup[1], reverse = True)
 
-    # need to move sort into my group by method.  Python needs to sort firstr
+    cards.sort(key=lambda c: c.rank_value, reverse = True)
     rank_value_groups = _group_cards_by_attribute(cards, 'rank_value')
     rank_value_groups.sort(key=lambda tup: tup[1], reverse = True)
-    pair_count, set_count, quad_count = __count_pairs(rank_value_groups)
+    pair_count, set_count, quad_count = _count_pairs(rank_value_groups)
 
     straight_cards = _find_straight(cards)
     straight = True if len(straight_cards) > 4 else False
 
-    cards.sort(key=lambda tup: tup[2], reverse = True)
+    cards.sort(key=lambda c: c.suit, reverse = True)
     suit_groups = _group_cards_by_attribute(cards, 'suit')
     suit_groups.sort(key=lambda tup: tup[1], reverse = True)
     flush_counter = suit_groups[0][1]
 
+    best_hand = _determine_best_hand(pair_count, set_count, straight, flush_counter, quad_count, straight_cards)
+    top_five_cards = _get_top_five(best_hand, suit_groups, straight_cards, rank_value_groups)
+
+    return score_top_five_cards(best_hand, top_five_cards)
+
+def _get_top_five(best_hand, suit_groups, straight_cards, rank_value_groups):
+    card_count = 0
+    top_five_cards = []
+    if best_hand == __FLUSH:
+        for sp in suit_groups:
+            for c in sp[2]:
+                if card_count < 5:
+                    top_five_cards.append(c)
+                    card_count += 1
+    elif best_hand == __STRAIGHT or best_hand == __ROYAL_FLUSH:
+        for c in straight_cards:
+            if card_count < 5:
+                top_five_cards.append(c)
+                card_count += 1
+    else:
+        for sp in rank_value_groups:
+            for c in sp[2]:
+                if card_count < 5:
+                    top_five_cards.append(c)
+                    card_count += 1
+    return top_five_cards
+
+def _determine_best_hand(pair_count, set_count, straight, flush_counter, quad_count, straight_cards):
     string_score = __HIGH_CARD
     if pair_count == 1:
         string_score = __PAIR
@@ -53,7 +79,7 @@ def score_best_hand(string_cards: list):
 
     if pair_count == 1 and set_count == 1:
         string_score = __FULL_HOUSE
-    
+
     if set_count > 1:
         string_score = __FULL_HOUSE
 
@@ -65,34 +91,7 @@ def score_best_hand(string_cards: list):
             string_score = __ROYAL_FLUSH
         else:
             string_score = __STRAIGHT_FLUSH
-
-    card_count = 0
-    top_five_cards = []
-    if string_score == __FLUSH:
-        for sp in suit_groups:
-            for c in sp[2]:
-                if card_count < 5:
-                    top_five_cards.append(c)
-                    card_count += 1
-    elif string_score == __STRAIGHT or string_score == __ROYAL_FLUSH:
-        for c in straight_cards:
-            if card_count < 5:
-                top_five_cards.append(c)
-                card_count += 1
-    else:
-        for sp in rank_value_groups:
-            for c in sp[2]:
-                if card_count < 5:
-                    top_five_cards.append(c)
-                    card_count += 1
-
-    for c in top_five_cards:
-        string_score += str(c.rank_value + __PLACE_MODIFIER)
-        string_score += __suit_conversion(c.suit)
-
-    score = int(string_score)
-
-    return Result(score, [f'{c.rank}{c.suit}' for c in top_five_cards])
+    return string_score
 
 def _find_straight(cards):
     next_values = []
@@ -137,7 +136,7 @@ def __count_straight(cards):
 
     return straight_counter
 
-def __count_pairs(grouped_cards):
+def _count_pairs(grouped_cards):
     pair_count = 0
     set_count = 0
     quad_count = 0
@@ -170,44 +169,8 @@ def _to_cards(string_cards: list):
             if len(break_out) > 2:
                 raise InvalidCardException(f'{break_out} is not a valid card!')
 
-            cards.append(Card(break_out[0], __get_rank_value(break_out[0]), break_out[1]))
+            cards.append(Card(break_out[0], break_out[1]))
         else:
             raise DuplicateCardException(f'You can\'t have more than one {sc}!')
 
     return cards
-
-def __suit_conversion(suit):
-    if suit == 'C':
-        return "1"
-    
-    if suit == 'D':
-        return "2"
-
-    if suit == 'H':
-        return "3"
-
-    if suit == 'S':
-        return "4"
-
-    raise InvalidCardException(f'{suit} is an invalid suit!')
-
-def __get_rank_value(rank):
-    if rank == 'T':
-        return 10
-    
-    if rank == 'J':
-        return 11
-
-    if rank == 'Q':
-        return 12
-
-    if rank == 'K':
-        return 13
-    
-    if rank == 'A':
-        return 14
-
-    try:
-        return int(rank)
-    except:
-        raise InvalidCardException(f'Expected a valid card rank.  Received {rank}!')
