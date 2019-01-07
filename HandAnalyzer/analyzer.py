@@ -2,6 +2,7 @@ from collections import namedtuple
 from itertools import groupby
 from operator import attrgetter
 from .exceptions import DuplicateCardException
+from .exceptions import InvalidCardException
 
 Card = namedtuple('Card', ['rank', 'rank_value', 'suit'])
 Result = namedtuple('Result', ['hand_score', 'best_five'])
@@ -21,7 +22,7 @@ def score_best_hand(string_cards: list):
     cards = _to_cards(string_cards)
     cards.sort(key=lambda tup: tup[1], reverse = True)
 
-    # need to move sort into my group by method.  Python needs to sort first
+    # need to move sort into my group by method.  Python needs to sort firstr
     rank_value_groups = _group_cards_by_attribute(cards, 'rank_value')
     rank_value_groups.sort(key=lambda tup: tup[1], reverse = True)
     pair_count, set_count, quad_count = __count_pairs(rank_value_groups)
@@ -166,6 +167,9 @@ def _to_cards(string_cards: list):
         if sc not in seen:
             seen.add(sc)
             break_out = list(sc)
+            if len(break_out) > 2:
+                raise InvalidCardException(f'{break_out} is not a valid card!')
+
             cards.append(Card(break_out[0], __get_rank_value(break_out[0]), break_out[1]))
         else:
             raise DuplicateCardException(f'You can\'t have more than one {sc}!')
@@ -185,7 +189,7 @@ def __suit_conversion(suit):
     if suit == 'S':
         return "4"
 
-    return 'Potato'
+    raise InvalidCardException(f'{suit} is an invalid suit!')
 
 def __get_rank_value(rank):
     if rank == 'T':
@@ -203,4 +207,7 @@ def __get_rank_value(rank):
     if rank == 'A':
         return 14
 
-    return int(rank)
+    try:
+        return int(rank)
+    except:
+        raise InvalidCardException(f'Expected a valid card rank.  Received {rank}!')

@@ -25,3 +25,9 @@ seen
 cards = ['2S', '2C', '3H', '3D', '4C', '4S', '5S', '5D', '6H', '6C', '7S', '7C']
 cards.sort(reverse = True)
 cards
+
+#%%
+if type(1) is not int:
+    print(True)
+else:
+    print(False)

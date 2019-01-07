@@ -1,6 +1,7 @@
 import pytest
 from HandAnalyzer import analyzer
 from HandAnalyzer.exceptions import DuplicateCardException
+from HandAnalyzer.exceptions import InvalidCardException
 
 @pytest.mark.parametrize("test_input,expected", [
     (['2S', '3H'], analyzer.Result(11133124, ['3H', '2S'])),
@@ -127,6 +128,19 @@ def test_with_whole_deck_should_return_royal_flush():
     actual = analyzer.score_best_hand(cards)
 
     assert actual == expected
+
+@pytest.mark.parametrize("test_input", [
+    ['Don'],
+    ['D0n'],
+    ['D1n'],
+    ['AHD'],
+    ['HA'],
+    ['AHAD'],
+    ['AX']
+])
+def test_not_a_card_should_throw_invalid_card_exception(test_input):
+    with pytest.raises(InvalidCardException):
+        analyzer.score_best_hand(test_input)
 
 # ___________Hand Ranks____________
 # HighCard       (1)
