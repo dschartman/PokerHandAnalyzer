@@ -26,3 +26,6 @@ class Card(object):
             return int(rank)
         except:
             raise InvalidCardException(f'Expected a valid card rank.  Received {rank}!')
+
+    def __eq__(self, other): 
+        return ((self.rank, self.suit) == (other.rank, other.suit))

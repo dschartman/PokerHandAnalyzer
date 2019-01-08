@@ -20,85 +20,89 @@ __ROYAL_FLUSH = "20"
 def score_best_hand(string_cards: list):
     cards = _to_cards(string_cards)
 
+    best_paired_hand, paired_cards = _find_best_paired_cards(cards)
+    best_straight_hand, straight_cards = _find_best_straight_cards(cards)
+    best_flush_hand, flush_cards = _find_best_flush_cards(cards)
+
+    if best_flush_hand is not None and best_straight_hand is not None:
+        if flush_cards == straight_cards:
+            if straight_cards[0].rank_value == 14:
+                return score_top_five_cards(__ROYAL_FLUSH, straight_cards)
+            else:
+                return score_top_five_cards(__STRAIGHT_FLUSH, straight_cards)
+
+        if straight_cards[0].rank_value == 14 and flush_cards == straight_cards:
+            return score_top_five_cards(__ROYAL_FLUSH, straight_cards)
+    
+    if best_paired_hand == __QUADS:
+        return score_top_five_cards(__QUADS, paired_cards)
+
+    if best_paired_hand == __FULL_HOUSE:
+        return score_top_five_cards(__FULL_HOUSE, paired_cards)
+
+    if best_flush_hand == __FLUSH:
+        return score_top_five_cards(__FLUSH, flush_cards)
+
+    if best_straight_hand == __STRAIGHT:
+        return score_top_five_cards(__STRAIGHT, straight_cards)
+
+    if best_paired_hand == __SET:
+        return score_top_five_cards(__SET, paired_cards)
+
+    if best_paired_hand == __TWO_PAIR:
+        return score_top_five_cards(__TWO_PAIR, paired_cards)
+
+    if best_paired_hand == __PAIR:
+        return score_top_five_cards(__PAIR, paired_cards)
+
+    high_card, high_cards = _find_best_high_cards(cards)
+    return score_top_five_cards(__HIGH_CARD, high_cards)
+
+def _find_best_high_cards(cards: list):
+    return __HIGH_CARD, sorted(cards, key=lambda c: c.rank_value, reverse = True)[:5]
+
+def _find_best_paired_cards(cards: list):
     cards.sort(key=lambda c: c.rank_value, reverse = True)
     rank_value_groups = _group_cards_by_attribute(cards, 'rank_value')
     rank_value_groups.sort(key=lambda tup: tup[1], reverse = True)
     pair_count, set_count, quad_count = _count_pairs(rank_value_groups)
 
-    straight_cards = _find_straight(cards)
-    straight = True if len(straight_cards) > 4 else False
+    best_hand = None
+    if pair_count == 1:
+        best_hand = __PAIR
 
-    cards.sort(key=lambda c: c.suit, reverse = True)
-    suit_groups = _group_cards_by_attribute(cards, 'suit')
-    suit_groups.sort(key=lambda tup: tup[1], reverse = True)
-    flush_counter = suit_groups[0][1]
+    if pair_count > 1:
+        best_hand = __TWO_PAIR
 
-    best_hand = _determine_best_hand(pair_count, set_count, straight, flush_counter, quad_count, straight_cards)
-    top_five_cards = _get_top_five(best_hand, suit_groups, straight_cards, rank_value_groups)
+    if set_count == 1:
+        best_hand = __SET
 
-    return score_top_five_cards(best_hand, top_five_cards)
+    if pair_count == 1 and set_count == 1:
+        best_hand = __FULL_HOUSE
 
-def _get_top_five(best_hand, suit_groups, straight_cards, rank_value_groups):
+    if set_count > 1:
+        best_hand = __FULL_HOUSE
+
+    if quad_count == 1:
+        best_hand = __QUADS
+
     card_count = 0
     top_five_cards = []
-    if best_hand == __FLUSH:
-        for sp in suit_groups:
-            for c in sp[2]:
-                if card_count < 5:
-                    top_five_cards.append(c)
-                    card_count += 1
-    elif best_hand == __STRAIGHT or best_hand == __ROYAL_FLUSH:
-        for c in straight_cards:
+    for sp in rank_value_groups:
+        for c in sp[2]:
             if card_count < 5:
                 top_five_cards.append(c)
                 card_count += 1
-    else:
-        for sp in rank_value_groups:
-            for c in sp[2]:
-                if card_count < 5:
-                    top_five_cards.append(c)
-                    card_count += 1
-    return top_five_cards
 
-def _determine_best_hand(pair_count, set_count, straight, flush_counter, quad_count, straight_cards):
-    string_score = __HIGH_CARD
-    if pair_count == 1:
-        string_score = __PAIR
+    return best_hand, top_five_cards
 
-    if pair_count > 1:
-        string_score = __TWO_PAIR
-
-    if set_count == 1:
-        string_score = __SET
-
-    if straight:
-        string_score = __STRAIGHT
-
-    if flush_counter > 4:
-        string_score = __FLUSH
-
-    if pair_count == 1 and set_count == 1:
-        string_score = __FULL_HOUSE
-
-    if set_count > 1:
-        string_score = __FULL_HOUSE
-
-    if quad_count == 1:
-        string_score = __QUADS
-
-    if straight and flush_counter > 4:
-        if straight_cards[0].rank_value == 14:
-            string_score = __ROYAL_FLUSH
-        else:
-            string_score = __STRAIGHT_FLUSH
-    return string_score
-
-def _find_straight(cards):
+def _find_best_straight_cards(cards: list):
+    sorted_cards = sorted(cards, key=lambda c: c.rank_value, reverse = True)
     next_values = []
     previous_value = 0
     straight = []
     wheel = False
-    for c in cards:
+    for c in sorted_cards:
         if c.rank_value == previous_value:
             continue
 
@@ -118,23 +122,32 @@ def _find_straight(cards):
         else:
             next_values = [c.rank_value - 1]
 
+    straight = straight[:5]
+
     if wheel:
        straight.append(straight.pop(0))
 
-    return straight
+    if len(straight) > 4:
+        best_hand = __STRAIGHT
+    else:
+        best_hand = None
 
-def __count_straight(cards):
-    straight_counter = 0
-    next_value = 0
-    for c in cards:
-        if c.rank_value == next_value:
-            straight_counter += 1
-        else:
-            straight_counter = 1
+    return best_hand, straight
 
-        next_value = c.rank_value - 1
+def _find_best_flush_cards(cards: list):
+    cards.sort(key=lambda c: c.rank_value, reverse = True)
+    cards.sort(key=lambda c: c.suit, reverse = True)
+    suit_groups = _group_cards_by_attribute(cards, 'suit')
+    suit_groups.sort(key=lambda tup: tup[1], reverse = True)
+    flush_counter = suit_groups[0][1]
+    flush_cards = []
+    if flush_counter > 4:
+        best_hand = __FLUSH
+        flush_cards = suit_groups[0][2][:5]
+    else:
+        best_hand = None
 
-    return straight_counter
+    return best_hand, flush_cards
 
 def _count_pairs(grouped_cards):
     pair_count = 0

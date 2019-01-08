@@ -37,4 +37,22 @@ else:
 from HandAnalyzer.card import Card
 
 c = Card('A', 'S')
-c
+x = Card('A', 'S')
+
+print(c == x)
+
+#%%
+p = [1, 2, 3,4,1,23,4,5,6,7,6,4,56,45,6]
+slice(p)
+
+sorted(p)[:5]
+
+p = p[:5]
+p
+
+#%%
+x = ['AS']
+y = ['AS']
+
+if x == y:
+    print(True)
