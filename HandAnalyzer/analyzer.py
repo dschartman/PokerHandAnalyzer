@@ -97,12 +97,13 @@ def _find_best_paired_cards(cards: list):
     return best_hand, top_five_cards
 
 def _find_best_straight_cards(cards: list):
-    sorted_cards = sorted(cards, key=lambda c: c.rank_value, reverse = True)
+    cards.sort(key=lambda c: c.rank_value, reverse = True)
     next_values = []
     previous_value = 0
     straight = []
+    straights = []
     wheel = False
-    for c in sorted_cards:
+    for c in cards:
         if c.rank_value == previous_value:
             continue
 
@@ -111,6 +112,9 @@ def _find_best_straight_cards(cards: list):
                 wheel = False
 
         else:
+            if len(straight) > 4:
+                straights.append(straight)
+
             straight = []
             wheel = False
 
@@ -133,6 +137,30 @@ def _find_best_straight_cards(cards: list):
         best_hand = None
 
     return best_hand, straight
+
+# def _find_best_straight_cards_t(cards: list):
+#     buckets = None
+#     straight = None
+#     previous_rank_value = 0
+#     for c in cards:
+#         if buckets is None:
+#             buckets = []
+#             buckets.append([c])
+
+#             continue
+
+#         for bucket in buckets:
+#             for bc in bucket:
+#                 if bc.rank_value = c.rank_value
+
+#             if c not in bucket:
+#                 for bc in bucket:
+#                 if bc.rank_value - 1 == c.rank_value:
+
+            
+
+
+#     return straights
 
 def _find_best_flush_cards(cards: list):
     cards.sort(key=lambda c: c.rank_value, reverse = True)

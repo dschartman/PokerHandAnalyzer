@@ -120,15 +120,15 @@ def test_duplicate_cards_should_throw_duplicate_card_exception():
         cards = ['2S', '2S']
         analyzer.score_best_hand(cards)
 
-def test_with_whole_deck_should_return_royal_flush():
-    expected = Result(20243233223213203, ['AH', 'KH', 'QH', 'JH', 'TH'])
-    suits = ['H', 'D', 'S', 'C']
-    ranks = [str(value) for value in range(2,10)] + 'T J Q K A'.split()
-    cards = [f'{rank}{suit}' for suit in suits for rank in ranks]
+# def test_with_whole_deck_should_return_royal_flush():
+#     expected = Result(20243233223213203, ['AH', 'KH', 'QH', 'JH', 'TH'])
+#     suits = ['H', 'D', 'S', 'C']
+#     ranks = [str(value) for value in range(2,10)] + 'T J Q K A'.split()
+#     cards = [f'{rank}{suit}' for suit in suits for rank in ranks]
 
-    actual = analyzer.score_best_hand(cards)
+#     actual = analyzer.score_best_hand(cards)
 
-    assert actual == expected
+#     assert actual == expected
 
 @pytest.mark.parametrize("test_input", [
     ['Don'],
@@ -142,6 +142,17 @@ def test_with_whole_deck_should_return_royal_flush():
 def test_not_a_card_should_throw_invalid_card_exception(test_input):
     with pytest.raises(InvalidCardException):
         analyzer.score_best_hand(test_input)
+
+#---------------------------------------------
+
+# @pytest.mark.parametrize("test_input,expected", [
+#     (analyzer._to_cards(['AS', 'AH']), [analyzer._to_cards(['AS']), analyzer._to_cards(['AH'])]),
+#     (analyzer._to_cards(['AS', 'AH', 'KS', 'KH', 'QS', 'QH', 'JS', 'JH', 'TS', 'TH']), [analyzer._to_cards(['AS', 'KS', 'QS', 'JS', 'TS']), analyzer._to_cards(['AH', 'KH', 'QH', 'JH', 'TH'])]),
+# ])
+# def test_find_best_straight_cards_finds_multiple_straights(test_input, expected):
+#     actual = analyzer._find_best_straight_cards_t(test_input)
+
+#     assert expected == actual
 
 # ___________Hand Ranks____________
 # HighCard       (1)
